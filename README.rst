@@ -22,17 +22,17 @@ Got any examples?
 Sure thing.
 
 Original:
-* http://i.imgur.com/yRMe6vw.png
+ * http://i.imgur.com/yRMe6vw.png
 Gimp, 1px radias "Despeckle", -1 black, 256 white, not adaptive, not recursive (normal 3x3 median filter):
-* http://i.imgur.com/AwhwsSr.png
+ * http://i.imgur.com/AwhwsSr.png
 Above, at 50% wetness (blend with original):
-* http://i.imgur.com/tD6PIhU.png
+ * http://i.imgur.com/tD6PIhU.png
 Wimg median, normal:
-* http://i.imgur.com/HFdwiXf.png
+ * http://i.imgur.com/HFdwiXf.png
 Wimg median, blurry:
-* http://i.imgur.com/O2Lx1fs.png
+ * http://i.imgur.com/O2Lx1fs.png
 Wimg median, blurrier:
-* http://i.imgur.com/mIzMm7w.png
+ * http://i.imgur.com/mIzMm7w.png
 
 Yes, "normal", "blurry", and "blurrier" look extremely similar in real world
 examples. However, you will find that "blurrier" shows slightly less aliasing
