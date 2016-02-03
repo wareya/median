@@ -23,7 +23,7 @@ Sure thing.
 
 Original:
  * http://i.imgur.com/yRMe6vw.png
-Gimp, 1px radias "Despeckle", -1 black, 256 white, not adaptive, not recursive (normal 3x3 median filter):
+Gimp, 1px radius "Despeckle", -1 black, 256 white, not adaptive, not recursive (normal 3x3 median filter):
  * http://i.imgur.com/AwhwsSr.png
 Above, at 50% wetness (blend with original):
  * http://i.imgur.com/tD6PIhU.png
@@ -33,7 +33,7 @@ Wimg median, blurry:
  * http://i.imgur.com/DKyk9it.png
 Wimg median, blurrier:
  * http://i.imgur.com/cQvf3cF.png
-Wimb median, special (dynamic blur):
+Wimg median, special (dynamic blur):
  * http://i.imgur.com/3OBF4qf.png
 
 Yes, "normal", "blurry", and "blurrier" look extremely similar in real world
