@@ -69,7 +69,8 @@ I get really bad moire.
 That's a drawback any 3x3 median filter will have with high-but-not-high-enough
 frequency patterns in the image. For example, http://i.imgur.com/rdCQajw.jpg is
 filtered into http://i.imgur.com/Bq2YGUs.png -- you can use --special to reduce
-the moire pattern at the expense of a lot of sharpness.
+the moire pattern at the expense of a lot of sharpness. You could also try
+running the filter multiple times.
 
 You can try to reduce other forms of moire by using nonlinear srgb with --srgb,
 but this will cause dark fringing when hue and saturation change.
