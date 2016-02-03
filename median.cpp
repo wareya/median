@@ -42,7 +42,7 @@ int main(int argc, const char* argv[])
 {
     if(argc == 1 or strcmp(argv[1], "--help") == 0 or strcmp(argv[1], "-h") == 0)
     {
-        puts("Usage: median <filename> [--srgb] [--blurry|--blurrier|--special]");
+        puts("Usage: median <filename> [--srgb] [--blurry|blurrier|special] [--split]");
         puts("<filename> must be a farbfeld image file with the .ff extension present.");
         puts("If <filename> has an extension, the output will contain it: 'fab.ff.ppm'");
         puts("The output filename uses the input filename with the ppm file extension.");
@@ -60,6 +60,9 @@ int main(int argc, const char* argv[])
         puts("The median set is blurred with a triangle kernel that catches the edges.");
         puts("This is done after sorting, so it's different from straightforward blur.");
         puts("It's almost as sharp as a 2x2 blur but with less noise, and is centered.");
+        puts("");
+        puts("'--split' performs the sorting on each separate RGB channel, rather than");
+        puts("on the broad pixel value as a whole. Good for strong dithered pixel art.");
         puts("");
         puts("ppm is a very old text-based image format that is very easy to generate.");
         puts("For software that can open ppm images, I use KolourPaint, a Paint clone.");
@@ -81,8 +84,9 @@ int main(int argc, const char* argv[])
     
     puts("Running median");
     
-    int blurry = 0;
     bool dolinear = true;
+    int blurry = 0;
+    bool split = false;
     int n = 3;
     if(argc >= n)
     {
@@ -99,16 +103,28 @@ int main(int argc, const char* argv[])
         {
             blurry = 1;
             puts("Blurry mode.");
+            n += 1;
         }
         else if(strcmp(argv[n-1], "--blurrier") == 0)
         {
             blurry = 2;
             puts("Blurrier mode.");
+            n += 1;
         }
         else if(strcmp(argv[n-1], "--special") == 0)
         {
             blurry = 3;
             puts("Special mode.");
+            n += 1;
+        }
+    }
+    if(argc >= n)
+    {
+        if(strcmp(argv[n-1], "--split") == 0)
+        {
+            split = 1;
+            puts("Split channel mode.");
+            n += 1;
         }
     }
     
@@ -147,7 +163,23 @@ int main(int argc, const char* argv[])
             push(x, y);
             push(x, y);
             
-            std::sort(testpixels.begin(), testpixels.end());
+            if(split)
+            {
+                std::vector<float> r, g, b;
+                for(auto pixel : testpixels)
+                {
+                    r.push_back(pixel.r);
+                    g.push_back(pixel.g);
+                    b.push_back(pixel.b);
+                }
+                std::sort(r.begin(), r.end());
+                std::sort(g.begin(), g.end());
+                std::sort(b.begin(), b.end());
+                for(unsigned i = 0; i < testpixels.size(); i++)
+                    testpixels[i] = {r[i], g[i], b[i]};
+            }
+            else
+                std::sort(testpixels.begin(), testpixels.end());
             
             // A one-dimensional image with at least two pixels has a minimum kernel size of two pixels: center and side.
             // Sides are weighted at 2, and center is weighted at 4. We shouldn't run this cout statement.

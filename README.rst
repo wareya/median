@@ -47,6 +47,17 @@ with almost the same smoothness as a blur. The implementation here is almost as
 sharp as a 2x2 box blur, but with much less noise, and the property of being
 centered.
 
+There is also a setting '--split' for sorting individual RGB channels, which
+can work wonders on pixelated images with lots of sharp color changes. Before:
+http://i.imgur.com/fllo2mP.png -- After: http://i.imgur.com/dxZ0Ict.png -- The
+improvement is much more noticable with --normal mode. These pictures were done
+with --special mode.
+
+I'm working on pixel art.
+=========================
+It might work well. If it doesn't, try --split. If you're looking for an AA or
+upscaling function, look elsewhere, such as at XBR.
+
 "Normal" has a little blur where gimp doesn't.
 ==============================================
 This is because the method I use gives 16 samples of which to calculate a
