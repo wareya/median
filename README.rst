@@ -30,9 +30,9 @@ Above, at 50% wetness (blend with original):
 Wimg median, normal:
  * http://i.imgur.com/HFdwiXf.png
 Wimg median, blurry:
- * http://i.imgur.com/O2Lx1fs.png
+ * http://i.imgur.com/DKyk9it.png
 Wimg median, blurrier:
- * http://i.imgur.com/mIzMm7w.png
+ * http://i.imgur.com/cQvf3cF.png
 Wimb median, special (dynamic blur):
  * http://i.imgur.com/3OBF4qf.png
 
