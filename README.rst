@@ -33,17 +33,25 @@ Wimg median, blurry:
  * http://i.imgur.com/O2Lx1fs.png
 Wimg median, blurrier:
  * http://i.imgur.com/mIzMm7w.png
+Wimb median, special (dynamic blur):
+ * http://i.imgur.com/3OBF4qf.png
 
 Yes, "normal", "blurry", and "blurrier" look extremely similar in real world
 examples. However, you will find that "blurrier" shows slightly less aliasing
 than the other two. The difference between "normal" and "blurry", on the other
 hand, is invisible except for in certain pathological pixel patterns.
 
+"special" is a mode that sorts a median set, but then blurs it with a triangle
+filter. This results in an image with almost as little noise as a median, but
+with almost the same smoothness as a blur. The implementation here is almost as
+sharp as a 2x2 box blur, but with much less noise, and the property of being
+centered.
+
 "Normal" has a little blur where gimp doesn't.
 ==============================================
-This is because the method I use gives 16 samples to calculate a median of. The
-"correct" way to select a median between an even number of elements is to
-average the central two samples. If you dislike this, you can patch the method
+This is because the method I use gives 16 samples of which to calculate a
+median. The "correct" way to select a median between an even number of elements
+averages the central two samples. If you dislike this, you can patch the method
 and add an extra center sample. Don't remove one; you'll crash on one-dimension
 images. Being biased towards the higher or lower center sample will result in
 even more bright or dark fringing on certain edge patterns.
