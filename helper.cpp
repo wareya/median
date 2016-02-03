@@ -1,4 +1,6 @@
-// Simple image stuff helper library. Use --std=c++11
+// compile with --std=c++11
+
+// Simple image stuff helper library.
 //
 // Intended for use for writing small image testing programs.
 //
@@ -122,6 +124,12 @@ struct triad
     triad operator+(triad o)
     {
         return triad(r+o.r, g+o.g, b+o.b);
+    }
+    void operator+=(triad o)
+    {
+        r += o.r;
+        g += o.g;
+        b += o.b;
     }
     triad operator*(float f)
     {

@@ -1,3 +1,5 @@
+// compile with --std=c++11
+
 #include "helper.cpp" 
 
 #include <algorithm>
@@ -40,16 +42,21 @@ int main(int argc, const char* argv[])
 {
     if(argc == 1 or strcmp(argv[1], "--help") == 0 or strcmp(argv[1], "-h") == 0)
     {
-        puts("Usage: median <filename> [--blurry|--blurrier]");
+        puts("Usage: median <filename> [--blurry|--blurrier|--special]");
         puts("<filename> must be a farbfeld image file with the .ff extension present.");
         puts("If <filename> has an extension, the output will contain it: 'fab.ff.ppm'");
         puts("The output filename uses the input filename with the ppm file extension.");
         puts("");
-        puts("'--blurry\' makes the filter blend more tentative pixel values together.");
+        puts("'--blurry' makes the filter blend multiple kernel pixel values together.");
         puts("It's nearly invisible, but *does* smooth certain features very slightly.");
         puts("");
-        puts("'--blurrier\' is like '--blurry', but blurs more tentative pixel values.");
+        puts("'--blurrier' is like '--blurry', but blends more tentative pixel values.");
         puts("It's much stronger, and can make or break the filtering of some artwork.");
+        puts("");
+        puts("'--special' does not weight the median but instead blurs the median set.");
+        puts("The median set is blurred with a triangle kernel that catches the edges.");
+        puts("This is done after sorting, so it's different from straightforward blur.");
+        puts("It's almost as sharp as a 2x2 blur but with less noise, and is centered.");
         puts("");
         puts("ppm is a very old text-based image format that is very easy to generate.");
         puts("For software that can open ppm images, I use KolourPaint, a Paint clone.");
@@ -84,6 +91,11 @@ int main(int argc, const char* argv[])
             blurry = 2;
             puts("Blurrier mode.");
         }
+        else if(strcmp(argv[2], "--special") == 0)
+        {
+            blurry = 3;
+            puts("Special mode.");
+        }
     }
     
     img.makelinear_worse();
@@ -94,6 +106,7 @@ int main(int argc, const char* argv[])
         {
             std::vector<triad> testpixels;
             // Kernel: 121 \n 242 \n 121
+            // Implemented by duplication.
             auto push = [&](long ax, long ay)
             {
                 if(ax >= 0 and ax < img.width and ay >= 0 and ay < img.height)
@@ -127,58 +140,76 @@ int main(int argc, const char* argv[])
             if(testpixels.size() < 6)
                 std::cout << testpixels.size() << " " << x << " " << y << " -- kernelsize, x, y \n";
             
-            if((testpixels.size()&1) == 1)
+            if(blurry < 3)
             {
-                auto mid = (testpixels.size()-1)/2;
-                if(blurry == 0)
+                if((testpixels.size()&1) == 1)
                 {
-                    dest(x,y) = testpixels[mid];
+                    auto mid = (testpixels.size()-1)/2;
+                    if(blurry == 0)
+                    {
+                        dest(x,y) = testpixels[mid];
+                    }
+                    if(blurry == 1)
+                    {
+                        // 3 width
+                        dest(x,y) = (testpixels[mid-1]
+                                    +testpixels[mid  ]
+                                    +testpixels[mid+1])*(1.0/3);
+                    }
+                    if(blurry == 2)
+                    {
+                        // 5 width
+                        dest(x,y) = (testpixels[mid-2]
+                                    +testpixels[mid-1]
+                                    +testpixels[mid  ]
+                                    +testpixels[mid+1]
+                                    +testpixels[mid+2])*(1.0/5);
+                    }
                 }
-                if(blurry == 1)
+                else // even number of cells
                 {
-                    // 3 width
-                    dest(x,y) = (testpixels[mid-1]
-                                +testpixels[mid  ]
-                                +testpixels[mid+1])*(1.0/3);
-                }
-                if(blurry == 2)
-                {
-                    // 5 width
-                    dest(x,y) = (testpixels[mid-2]
-                                +testpixels[mid-1]
-                                +testpixels[mid  ]
-                                +testpixels[mid+1]
-                                +testpixels[mid+2])*(1.0/5);
+                    auto topmid = testpixels.size()/2;
+                    if(blurry == 0)
+                    {
+                        // 2 width
+                        dest(x,y) = (testpixels[topmid-1]
+                                    +testpixels[topmid  ])*0.5;
+                    }
+                    if(blurry == 1)
+                    {
+                        // 4 width
+                        dest(x,y) = (testpixels[topmid-2]
+                                    +testpixels[topmid-1]
+                                    +testpixels[topmid  ]
+                                    +testpixels[topmid+1])*0.25;
+                    }
+                    if(blurry == 2)
+                    {
+                        // 6 width
+                        dest(x,y) = (testpixels[topmid-3]
+                                    +testpixels[topmid-2]
+                                    +testpixels[topmid-1]
+                                    +testpixels[topmid  ]
+                                    +testpixels[topmid+1]
+                                    +testpixels[topmid+2])*(1.0/6);
+                    }
                 }
             }
-            else // even number of cells
+            else if (blurry == 3)
             {
-                auto topmid = testpixels.size()/2;
-                if(blurry == 0)
+                float mid = (testpixels.size()-1)/2.0;
+                triad scrap(0,0,0);
+                float normalize = 0;
+                for(unsigned i = 0; i < testpixels.size(); i++)
                 {
-                    // 2 width
-                    dest(x,y) = (testpixels[topmid-1]
-                                +testpixels[topmid  ])*0.5;
+                    float factor = mid-fabs(i-mid);
+                    factor += 1;
+                    scrap += testpixels[i]*factor;
+                    normalize += factor;
                 }
-                if(blurry == 1)
-                {
-                    // 4 width
-                    dest(x,y) = (testpixels[topmid-2]
-                                +testpixels[topmid-1]
-                                +testpixels[topmid  ]
-                                +testpixels[topmid+1])*0.25;
-                }
-                if(blurry == 2)
-                {
-                    // 6 width
-                    dest(x,y) = (testpixels[topmid-3]
-                                +testpixels[topmid-2]
-                                +testpixels[topmid-1]
-                                +testpixels[topmid  ]
-                                +testpixels[topmid+1]
-                                +testpixels[topmid+2])*(1.0/6);
-                }
+                dest(x,y) = scrap*(1/normalize);
             }
+            
             /*
             Old code that made sure to specifically gaussian blur things together.
             The new code uses an averaging filter due to the realization that the
