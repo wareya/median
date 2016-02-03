@@ -42,10 +42,13 @@ int main(int argc, const char* argv[])
 {
     if(argc == 1 or strcmp(argv[1], "--help") == 0 or strcmp(argv[1], "-h") == 0)
     {
-        puts("Usage: median <filename> [--blurry|--blurrier|--special]");
+        puts("Usage: median <filename> [--srgb] [--blurry|--blurrier|--special]");
         puts("<filename> must be a farbfeld image file with the .ff extension present.");
         puts("If <filename> has an extension, the output will contain it: 'fab.ff.ppm'");
         puts("The output filename uses the input filename with the ppm file extension.");
+        puts("");
+        puts("All filtering is done in linear RGB by default. Add '--srgb' immediately");
+        puts("after the input filename to filter in sRGB gamma. Sometimes fixes moire.");
         puts("");
         puts("'--blurry' makes the filter blend multiple kernel pixel values together.");
         puts("It's nearly invisible, but *does* smooth certain features very slightly.");
@@ -79,26 +82,38 @@ int main(int argc, const char* argv[])
     puts("Running median");
     
     int blurry = 0;
-    if(argc == 3)
+    bool dolinear = true;
+    int n = 3;
+    if(argc >= n)
     {
-        if(strcmp(argv[2], "--blurry") == 0)
+        if(strcmp(argv[n-1], "--srgb") == 0)
+        {
+            puts("Not using linear RGB.");
+            dolinear = false;
+            n += 1;
+        }
+    }
+    if(argc >= n)
+    {
+        if(strcmp(argv[n-1], "--blurry") == 0)
         {
             blurry = 1;
             puts("Blurry mode.");
         }
-        else if(strcmp(argv[2], "--blurrier") == 0)
+        else if(strcmp(argv[n-1], "--blurrier") == 0)
         {
             blurry = 2;
             puts("Blurrier mode.");
         }
-        else if(strcmp(argv[2], "--special") == 0)
+        else if(strcmp(argv[n-1], "--special") == 0)
         {
             blurry = 3;
             puts("Special mode.");
         }
     }
     
-    img.makelinear_worse();
+    if(dolinear)
+        img.makelinear_worse();
     
     for(unsigned int x = 0; x < img.width; x++)
     {
@@ -266,7 +281,8 @@ int main(int argc, const char* argv[])
     }
     puts("Done.");
     
-    dest.makesrgb_worse();
+    if(dolinear)
+        dest.makesrgb_worse();
     
     dest.writeppm(argv[1]);
 }
